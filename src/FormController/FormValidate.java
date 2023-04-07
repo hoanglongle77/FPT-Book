@@ -1,5 +1,5 @@
 package FormController;
 
-public class FormValidate implements  {
+public class FormValidate {
 
 }
