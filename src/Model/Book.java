@@ -1,6 +1,5 @@
 package Model;
 
-import java.util.Date;
 import java.util.Objects;
 
 public class Book {
@@ -10,13 +9,12 @@ public class Book {
 	private int quantity;
 	private int price;
 	private String description;
-	private Date createdAt;
 	
 	
 	public Book() {
 	}
 	
-	public Book(int id, String title, String author, int quantity, int price, String description, Date createdAt) {
+	public Book(int id, String title, String author, int quantity, int price, String description) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -24,7 +22,6 @@ public class Book {
 		this.quantity = quantity;
 		this.price = price;
 		this.description = description;
-		this.createdAt = createdAt;
 	}
 	
 	public int getId() {
@@ -63,24 +60,18 @@ public class Book {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Date getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
-	
+
 	@Override
 	public String toString() {
 		return "Book [id=" + id + ", title=" + title + ", author=" + author + ", quantity=" + quantity + ", price="
-				+ price + ", description=" + description + ", createdAt=" + createdAt + "]";
+				+ price + ", description=" + description + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(author, createdAt, description, id, price, quantity, title);
+		return Objects.hash(author, description, id, price, quantity, title);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -90,8 +81,11 @@ public class Book {
 		if (getClass() != obj.getClass())
 			return false;
 		Book other = (Book) obj;
-		return Objects.equals(author, other.author) && Objects.equals(createdAt, other.createdAt)
-				&& Objects.equals(description, other.description) && id == other.id && price == other.price
-				&& quantity == other.quantity && Objects.equals(title, other.title);
+		return Objects.equals(author, other.author) && Objects.equals(description, other.description) && id == other.id
+				&& price == other.price && quantity == other.quantity && Objects.equals(title, other.title);
 	}
+	
+	
+	
+	
 }

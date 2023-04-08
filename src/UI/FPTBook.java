@@ -43,12 +43,15 @@ public class FPTBook extends JFrame {
 	private JTextField textField_Title;
 	private JTextField textField_Author;
 	private JTextField textField_Price;
-
+	private JSpinner   spinner_Quantity;
+	private JComboBox<?> comboBox_Category;
+	private JTextArea textArea_Description;
+	private JTable table;
+    ArrayList<Book> myBookList = new ArrayList<>();
 	/**
 	 * Launch the application.
 	 */
-	ArrayList<Book> myBookList = new ArrayList<>();
-	private JTable table;
+
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -80,6 +83,74 @@ public class FPTBook extends JFrame {
 		}
 		return max;
 	}
+	
+	public void CheckEmptyField() {
+		textField_Title.getText();
+		textField_Author.setText("");
+		spinner_Quantity.setValue(0);
+		textField_Price.setText("");
+		comboBox_Category.setSelectedIndex(-1);
+		textArea_Description.setText("");
+	}
+	
+	public void ResetAllField() {
+		textField_Title.setText("");
+		textField_Author.setText("");
+		spinner_Quantity.setValue(0);
+		textField_Price.setText("");
+		comboBox_Category.setSelectedIndex(-1);
+		textArea_Description.setText("");
+	}
+	
+	public void NewBook() {
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		Object rowData[] = new Object[7];
+		Book newBook = new Book();
+		newBook.setId(GenerateID());
+		newBook.setTitle(textField_Title.getText());
+		newBook.setAuthor(textField_Author.getText());
+		newBook.setQuantity((int)spinner_Quantity.getValue());
+		newBook.setPrice(Integer.parseInt(textField_Price.getText()));
+		newBook.setDescription(textArea_Description.getText());
+		myBookList.add(newBook);
+		rowData[0] =  newBook.getId();
+		rowData[1] =  newBook.getTitle();
+		rowData[2] =  newBook.getAuthor();
+		rowData[3] =  newBook.getQuantity();
+		rowData[4] =  newBook.getPrice();
+	    //rowData[5] = b.getCategory();
+	    rowData[6] =  newBook.getDescription();
+	    model.addRow(rowData);
+		ResetAllField();
+	}
+	
+	
+	public void DeleteBook(Book deleteBook) {
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		Object rowData[] = new Object[7];
+		myBookList.remove(deleteBook);
+		rowData[0] =  deleteBook.getId();
+		rowData[1] =  deleteBook.getTitle();
+		rowData[2] =  deleteBook.getAuthor();
+		rowData[3] =  deleteBook.getQuantity();
+		rowData[4] =  deleteBook.getPrice();
+	    //rowData[5] = deleteBook.getCategory();
+	    rowData[6] =  deleteBook.getDescription();
+	   // model.removeRow();;
+	}
+	
+	public void UpdateBookByID() {
+		
+	}
+	
+	
+
+	
+	public void GetDataFromTable() {
+		
+	}
+	
+	
 	
 	
 	
@@ -200,7 +271,7 @@ public class FPTBook extends JFrame {
 		Label_Description.setBounds(10, 158, 58, 14);
 		panel_CRUD.add(Label_Description);
 		
-		JTextArea textArea_Description = new JTextArea();
+		textArea_Description = new JTextArea();
 		textArea_Description.setBounds(76, 158, 221, 81);
 		panel_CRUD.add(textArea_Description);
 		
@@ -219,11 +290,11 @@ public class FPTBook extends JFrame {
 		Button_Update.setBounds(56, 295, 89, 23);
 		panel_CRUD.add(Button_Update);
 		
-		JComboBox<Object> comboBox_Category = new JComboBox<Object>();
+		comboBox_Category = new JComboBox<Object>();
 		comboBox_Category.setBounds(76, 119, 221, 22);
 		panel_CRUD.add(comboBox_Category);
 		
-		JSpinner spinner_Quantity = new JSpinner();
+		spinner_Quantity = new JSpinner();
 		spinner_Quantity.setBounds(76, 67, 221, 20);
 		panel_CRUD.add(spinner_Quantity);
 		
@@ -238,14 +309,11 @@ public class FPTBook extends JFrame {
 		
 		DefaultTableModel tableModel = new DefaultTableModel();
 		table = new JTable(tableModel);
-		Object[] column = {"ID", "Title", "Author", "Quantity","Price","Category","Description","Created At"};
-		Object[] row = new Object[8];
+		Object[] column = {"ID", "Title", "Author", "Quantity","Price","Category","Description"};
+		Object[] row = new Object[7];
 		tableModel.setColumnIdentifiers(column);
 		table.setModel(tableModel);
 		scrollPane.setViewportView(table);
-		
-		
-	
 		
 		// 1. Open File 
 		MenuItem_OpenFile.addActionListener(new ActionListener() {
@@ -271,7 +339,7 @@ public class FPTBook extends JFrame {
 		// 3. About
 		mntmAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(contentPane, "FPT Book Management App v1.0 - By Le Nguyen Hoang Long");
+				JOptionPane.showMessageDialog(contentPane, "FPT Book Management App v1.0 - By Le Nguyen Hoang Long"," System Info!",JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		
@@ -285,47 +353,26 @@ public class FPTBook extends JFrame {
 		// 5. Reset
 		Button_Reset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textField_Title.setText("");
-				textField_Author.setText("");
-				spinner_Quantity.setValue(0);
-				textField_Price.setText("");
-				comboBox_Category.setSelectedIndex(-1);
-				textArea_Description.setText("");
+				ResetAllField();
 			}
 		});
 		
 		// 6. Button new - Use to create new book
 		Button_New.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Book myBook = new Book();
-				myBook.setId(GenerateID());
-				myBook.setTitle(textField_Title.getText());
-				myBook.setAuthor(textField_Author.getText());
-				myBook.setQuantity((int)spinner_Quantity.getValue());
-				myBook.setPrice(Integer.parseInt(textField_Price.getText()));
-				myBook.setDescription(textArea_Description.getText());
-				myBookList.add(myBook);
-				row[0] = myBook.getId();
-				row[1] = myBook.getTitle();
-				row[2] = myBook.getAuthor();
-				row[3] = myBook.getQuantity();
-				row[4] = myBook.getPrice();
-				//row[5] = myBook.getCategory();
-				row[6] = myBook.getDescription();
-				tableModel.addRow(row);
-				textField_Title.setText("");
-				textField_Author.setText("");
-				spinner_Quantity.setValue(0);
-				textField_Price.setText("");
-				comboBox_Category.setSelectedIndex(-1);
-				textArea_Description.setText("");
+				NewBook();
+				JOptionPane.showMessageDialog(contentPane, "You have successfully added new book", "Success!",JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		
 		// 7. Button delete - Use to delete a book in list
 		Button_Delete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+//			    if() {
+//					
+//				}else {
+//					
+//				}
 			}
 		});
 		
@@ -333,10 +380,7 @@ public class FPTBook extends JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int i = table.getSelectedRow();
-				TableModel model = table.getModel();
-				textField_Title.setText(model.getValueAt(i, 1).toString());
-				//..........
+				
 			}
 		});
 		
@@ -346,7 +390,7 @@ public class FPTBook extends JFrame {
 //				if() {
 //					
 //				}else {
-//					JOptionPane.showMessageDialog(contentPane, "Please select data from table");
+//					
 //				}
 			}
 		});
