@@ -7,8 +7,6 @@ import javax.swing.filechooser.FileFilter;
 public class FileTypeFilter extends FileFilter {
 	private final String extension;
 	private final String description;
-	
-	
 
 	public FileTypeFilter(String extension, String description) {
 		super();
@@ -16,16 +14,18 @@ public class FileTypeFilter extends FileFilter {
 		this.description = description;
 	}
 
+	public String getExtension() {
+		return extension;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
 	@Override
 	public boolean accept(File f) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

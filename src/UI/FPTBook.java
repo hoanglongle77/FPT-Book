@@ -219,7 +219,7 @@ public class FPTBook extends JFrame {
 		Button_Update.setBounds(56, 295, 89, 23);
 		panel_CRUD.add(Button_Update);
 		
-		JComboBox comboBox_Category = new JComboBox();
+		JComboBox<Object> comboBox_Category = new JComboBox<Object>();
 		comboBox_Category.setBounds(76, 119, 221, 22);
 		panel_CRUD.add(comboBox_Category);
 		
