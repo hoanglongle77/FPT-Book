@@ -46,7 +46,12 @@ public class FPTBook extends JFrame {
 	private JSpinner   spinner_Quantity;
 	private JComboBox<?> comboBox_Category;
 	private JTextArea textArea_Description;
+	private JButton Button_New;
+	private JButton Button_Delete;
+	private JButton Button_Update;
+	private JButton Button_Reset;
 	private JTable table;
+	private DefaultTableModel tableModel;
     ArrayList<Book> myBookList = new ArrayList<>();
 	/**
 	 * Launch the application.
@@ -84,13 +89,14 @@ public class FPTBook extends JFrame {
 		return max;
 	}
 	
-	public void CheckEmptyField() {
+	public String CheckEmptyField() {
 		textField_Title.getText();
-		textField_Author.setText("");
-		spinner_Quantity.setValue(0);
-		textField_Price.setText("");
-		comboBox_Category.setSelectedIndex(-1);
-		textArea_Description.setText("");
+		textField_Author.getText();
+		spinner_Quantity.getValue();
+		textField_Price.getText();
+		comboBox_Category.getSelectedIndex();
+		textArea_Description.getText();
+		return true;
 	}
 	
 	public void ResetAllField() {
@@ -102,8 +108,16 @@ public class FPTBook extends JFrame {
 		textArea_Description.setText("");
 	}
 	
+	public void SetDataToField(String title, String author, int quantity, int price, String description) {
+		textField_Title.setText(title);
+		textField_Author.setText(author);
+		spinner_Quantity.setValue(quantity);
+		textField_Price.setText(String.valueOf(price));
+//		comboBox_Category.setSelectedIndex(-1);
+		textArea_Description.setText(description);
+	}
+	
 	public void NewBook() {
-		DefaultTableModel model = (DefaultTableModel) table.getModel();
 		Object rowData[] = new Object[7];
 		Book newBook = new Book();
 		newBook.setId(GenerateID());
@@ -111,6 +125,7 @@ public class FPTBook extends JFrame {
 		newBook.setAuthor(textField_Author.getText());
 		newBook.setQuantity((int)spinner_Quantity.getValue());
 		newBook.setPrice(Integer.parseInt(textField_Price.getText()));
+	//  newBook.setQuantity();
 		newBook.setDescription(textArea_Description.getText());
 		myBookList.add(newBook);
 		rowData[0] =  newBook.getId();
@@ -120,39 +135,36 @@ public class FPTBook extends JFrame {
 		rowData[4] =  newBook.getPrice();
 	    //rowData[5] = b.getCategory();
 	    rowData[6] =  newBook.getDescription();
-	    model.addRow(rowData);
+	    tableModel.addRow(rowData);
 		ResetAllField();
 	}
 	
-	
 	public void DeleteBook(Book deleteBook) {
-		DefaultTableModel model = (DefaultTableModel) table.getModel();
-		Object rowData[] = new Object[7];
+		int selectedRowIndex = table.getSelectedRow();
 		myBookList.remove(deleteBook);
-		rowData[0] =  deleteBook.getId();
-		rowData[1] =  deleteBook.getTitle();
-		rowData[2] =  deleteBook.getAuthor();
-		rowData[3] =  deleteBook.getQuantity();
-		rowData[4] =  deleteBook.getPrice();
-	    //rowData[5] = deleteBook.getCategory();
-	    rowData[6] =  deleteBook.getDescription();
-	   // model.removeRow();;
+		tableModel.removeRow(selectedRowIndex);
 	}
 	
-	public void UpdateBookByID() {
-		
+	public void UpdateBook(Book updatedBook) {
+		updatedBook.setTitle(textField_Title.getText());
+		updatedBook.setAuthor(textField_Author.getText());
+		updatedBook.setQuantity((int)spinner_Quantity.getValue());
+		updatedBook.setPrice(Integer.parseInt(textField_Price.getText()));
+		updatedBook.setDescription(textArea_Description.getText());
 	}
 	
-	
-
-	
-	public void GetDataFromTable() {
-		
+	public Book GetDataFromTable() {
+		int selectedRowIndex = table.getSelectedRow();
+		int id = (int)tableModel.getValueAt(selectedRowIndex, 0);
+		String title = tableModel.getValueAt(selectedRowIndex, 1).toString();
+		String author = tableModel.getValueAt(selectedRowIndex, 2).toString();
+		int quantity = (int)tableModel.getValueAt(selectedRowIndex, 3);
+		int price = (int)tableModel.getValueAt(selectedRowIndex, 4);
+		//String category = tableModel.getValueAt(selectedRowIndex, 5).toString();
+		String description = tableModel.getValueAt(selectedRowIndex, 6).toString();
+		Book selectedBook = new Book(id,title,author,quantity,price,description);
+		return selectedBook;
 	}
-	
-	
-	
-	
 	
 	public FPTBook() {
 		setTitle("University of Greenwich - Book Management System");
@@ -275,17 +287,19 @@ public class FPTBook extends JFrame {
 		textArea_Description.setBounds(76, 158, 221, 81);
 		panel_CRUD.add(textArea_Description);
 		
-		JButton Button_New = new JButton("New");
+		Button_New = new JButton("New");
 		Button_New.setFont(new Font("Calibri", Font.BOLD, 11));
 		Button_New.setBounds(56, 250, 89, 23);
 		panel_CRUD.add(Button_New);
 		
-		JButton Button_Delete = new JButton("Delete");
+		Button_Delete = new JButton("Delete");
+		Button_Delete.setEnabled(false);
 		Button_Delete.setFont(new Font("Calibri", Font.BOLD, 11));
 		Button_Delete.setBounds(155, 250, 89, 23);
 		panel_CRUD.add(Button_Delete);
 		
-		JButton Button_Update = new JButton("Update");
+		Button_Update = new JButton("Update");
+		Button_Update.setEnabled(false);
 		Button_Update.setFont(new Font("Calibri", Font.BOLD, 11));
 		Button_Update.setBounds(56, 295, 89, 23);
 		panel_CRUD.add(Button_Update);
@@ -298,7 +312,7 @@ public class FPTBook extends JFrame {
 		spinner_Quantity.setBounds(76, 67, 221, 20);
 		panel_CRUD.add(spinner_Quantity);
 		
-		JButton Button_Reset = new JButton("Reset");
+		Button_Reset = new JButton("Reset");
 		Button_Reset.setFont(new Font("Calibri", Font.BOLD, 11));
 		Button_Reset.setBounds(155, 295, 89, 23);
 		panel_CRUD.add(Button_Reset);
@@ -307,8 +321,9 @@ public class FPTBook extends JFrame {
 		scrollPane.setBounds(314, 26, 693, 434);
 		contentPane.add(scrollPane);
 		
-		DefaultTableModel tableModel = new DefaultTableModel();
+		tableModel = new DefaultTableModel();
 		table = new JTable(tableModel);
+		
 		Object[] column = {"ID", "Title", "Author", "Quantity","Price","Category","Description"};
 		Object[] row = new Object[7];
 		tableModel.setColumnIdentifiers(column);
@@ -361,37 +376,44 @@ public class FPTBook extends JFrame {
 		Button_New.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				NewBook();
-				JOptionPane.showMessageDialog(contentPane, "You have successfully added new book", "Success!",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(contentPane, "You have add successfully", "Success!",JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		
 		// 7. Button delete - Use to delete a book in list
 		Button_Delete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//			    if() {
-//					
-//				}else {
-//					
-//				}
-			}
-		});
-		
-		// 8. Select Data from table - Use to get data from table
-		table.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
+				Book deleteBook = GetDataFromTable();
+				DeleteBook(deleteBook);
+				JOptionPane.showMessageDialog(contentPane, "You have deleted successfully", "Success!",JOptionPane.INFORMATION_MESSAGE);
+				Button_Delete.setEnabled(false);
+				ResetAllField();
+				Button_Update.setEnabled(false);
 			}
 		});
 		
 		// 8. Button update - Use to update a book in list
 		Button_Update.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				if() {
-//					
-//				}else {
-//					
-//				}
+				Book updateBook = GetDataFromTable();
+				UpdateBook(updateBook);
+				JOptionPane.showMessageDialog(contentPane, "You have updated successfully", "Success!",JOptionPane.INFORMATION_MESSAGE);
+				Button_Update.setEnabled(false);
+				ResetAllField();
+				Button_Delete.setEnabled(false);
+			}
+		});
+		
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount()>0) {
+					Button_Delete.setEnabled(true);
+					Button_Update.setEnabled(true);
+				}else {
+					Button_Delete.setEnabled(false);
+					Button_Update.setEnabled(false);
+				}
 			}
 		});
 	}
