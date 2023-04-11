@@ -1,7 +1,6 @@
 package FileController;
 
 import java.io.File;
-
 import javax.swing.filechooser.FileFilter;
 
 public class FileTypeFilter extends FileFilter {
@@ -30,5 +29,4 @@ public class FileTypeFilter extends FileFilter {
 		}
 		return f.getName().endsWith(extension);
 	}
-
 }
