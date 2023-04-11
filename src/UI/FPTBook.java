@@ -7,8 +7,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
 import FileController.FileTypeFilter;
 import Model.Book;
 import javax.swing.JMenuBar;
@@ -89,7 +87,7 @@ public class FPTBook extends JFrame {
 		return max;
 	}
 	
-	public String CheckEmptyField() {
+	public boolean CheckEmptyField() {
 		textField_Title.getText();
 		textField_Author.getText();
 		spinner_Quantity.getValue();
@@ -333,7 +331,45 @@ public class FPTBook extends JFrame {
 		// 1. Open File 
 		MenuItem_OpenFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				ArrayList<Book> myOpenList = new ArrayList<Book>();
+				JFileChooser myFileChooser = new JFileChooser(new File("c:\\"));
+				myFileChooser.setDialogTitle("Open a file");
+				myFileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
+				int result = myFileChooser.showOpenDialog(null);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					File fi = myFileChooser.getSelectedFile();
+					try(BufferedReader br = new BufferedReader(new FileReader(fi.getPath()));) {
+						String line;
+						try {
+							while((line = br.readLine())!= null) {
+								String [] words = line.split(", ");
+								row[0] = words[0];
+								row[1] = words[1];
+								row[2] = words[2];
+								row[3] = words[3];
+								row[4] = words[4];
+								row[6] = words[5];
+								//row[5] = words[5]; Add category cell and field
+								//row[6] = words[6];
+								tableModel.addRow(row);
+								Book b = new Book(Integer.parseInt(words[0]),words[1],words[2],Integer.parseInt(words[3]),Integer.parseInt(words[4]),words[5]);
+							    myOpenList.add(b);    
+							}
+							if(br != null) {
+								br.close();
+							}
+						} catch (NumberFormatException e1) {
+							JOptionPane.showMessageDialog(null,e1.getMessage());
+						} catch (IOException e2) {
+							JOptionPane.showMessageDialog(null,e2.getMessage());
+						}
+					}catch (FileNotFoundException e3) {
+						JOptionPane.showMessageDialog(null,e3.getMessage());
+					} catch (IOException e4) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(null,e4.getMessage());
+					}
+				}
 			}
 		});
 		
@@ -345,7 +381,17 @@ public class FPTBook extends JFrame {
 				myFileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
 				int result = myFileChooser.showSaveDialog(null);
 				if(result == JFileChooser.APPROVE_OPTION) {
-					
+					File fi = myFileChooser.getSelectedFile();
+					try {
+						FileWriter fw = new FileWriter(fi.getPath());
+						for(Book b : myBookList) {
+							fw.write(b.toString());
+						}
+						fw.flush();
+						fw.close();
+					}catch(IOException e2) {
+						JOptionPane.showMessageDialog(null, e2.getMessage());
+					}	
 				}
 				
 			}

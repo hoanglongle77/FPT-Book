@@ -19,13 +19,16 @@ public class FileTypeFilter extends FileFilter {
 	}
 
 	public String getDescription() {
-		return description;
+		return description + String.format(" (*%s)", extension);
 	}
 
 	@Override
 	public boolean accept(File f) {
 		// TODO Auto-generated method stub
-		return false;
+		if(f.isDirectory()) {
+			return true;
+		}
+		return f.getName().endsWith(extension);
 	}
 
 }
