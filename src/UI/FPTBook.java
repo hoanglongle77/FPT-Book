@@ -30,7 +30,7 @@ import javax.swing.JSpinner;
 import java.util.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.Toolkit;
 public class FPTBook extends JFrame {
 
 	/**
@@ -78,6 +78,8 @@ public class FPTBook extends JFrame {
 	private Object[] rowData = new Object[7];
 
 	ArrayList<Book> myBookList = new ArrayList<>();
+	private JTextField textField_STitle;
+	private JTextField textField_SAuthor;
 
 	/**
 	 * Launch the application.
@@ -88,7 +90,7 @@ public class FPTBook extends JFrame {
 				try {
 					FPTBook frame = new FPTBook();
 					frame.setVisible(true);
-				} catch (Exception e) {
+						} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -246,22 +248,23 @@ public class FPTBook extends JFrame {
 	 */
 
 	public FPTBook() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(FPTBook.class.getResource("/icon/logo-fpt.jpg")));
 		setTitle("University of Greenwich - Book Management System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1023, 510);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+		
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-
+		
 		menuBar = new JMenuBar();
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBounds(0, 0, 1007, 28);
 		contentPane.add(menuBar);
 
 		Menu_File = new JMenu("File");
-		Menu_File.setFont(new Font("Calibri", Font.PLAIN, 12));
+		Menu_File.setFont(new Font("Calibri", Font.PLAIN, 13));
 		menuBar.add(Menu_File);
 
 		MenuItem_OpenFile = new JMenuItem("Open File");
@@ -273,7 +276,7 @@ public class FPTBook extends JFrame {
 		Menu_File.add(MenuItem_SaveFile);
 
 		Menu_System = new JMenu("System");
-		Menu_System.setFont(new Font("Calibri", Font.PLAIN, 12));
+		Menu_System.setFont(new Font("Calibri", Font.PLAIN, 13));
 		menuBar.add(Menu_System);
 
 		MenuItem_Exit = new JMenuItem("Exit");
@@ -281,7 +284,7 @@ public class FPTBook extends JFrame {
 		Menu_System.add(MenuItem_Exit);
 
 		Menu_Help = new JMenu("Help");
-		Menu_Help.setFont(new Font("Calibri", Font.PLAIN, 12));
+		Menu_Help.setFont(new Font("Calibri", Font.PLAIN, 13));
 		menuBar.add(Menu_Help);
 
 		MenuItem_About = new JMenuItem("About");
@@ -295,105 +298,171 @@ public class FPTBook extends JFrame {
 
 		panel_CRUD = new JPanel();
 		panel_CRUD.setForeground(new Color(255, 255, 255));
-		panel_CRUD.setBackground(new Color(0, 0, 255));
+		panel_CRUD.setBackground(Color.LIGHT_GRAY);
 		tabbedPane.addTab("CRUD", null, panel_CRUD, null);
 		panel_CRUD.setLayout(null);
 
 		panel_Search = new JPanel();
-		panel_Search.setBackground(new Color(0, 0, 255));
-		tabbedPane.addTab("Search", null, panel_Search, null);
+		panel_Search.setBackground(Color.LIGHT_GRAY);
+		tabbedPane.addTab("Satistical and Search", null, panel_Search, null);
 		panel_Search.setLayout(null);
+		
+		JComboBox comboBox_SCategory = new JComboBox();
+		comboBox_SCategory.setFont(new Font("Calibri", Font.PLAIN, 11));
+		comboBox_SCategory.setBounds(66, 102, 142, 22);
+		panel_Search.add(comboBox_SCategory);
+		
+		JLabel lblTitle_Search = new JLabel("Title");
+		lblTitle_Search.setFont(new Font("Calibri", Font.PLAIN, 13));
+		lblTitle_Search.setBounds(10, 48, 46, 14);
+		panel_Search.add(lblTitle_Search);
+		
+		JLabel lblCategory_Search = new JLabel("Category");
+		lblCategory_Search.setFont(new Font("Calibri", Font.PLAIN, 13));
+		lblCategory_Search.setBounds(10, 108, 67, 14);
+		panel_Search.add(lblCategory_Search);
+		
+		JLabel lblAuthor_Search = new JLabel("Author");
+		lblAuthor_Search.setFont(new Font("Calibri", Font.PLAIN, 13));
+		lblAuthor_Search.setBounds(10, 77, 46, 14);
+		panel_Search.add(lblAuthor_Search);
+		
+		JButton Button_Search = new JButton("Search");
+		Button_Search.setBackground(new Color(13, 202, 240));
+		Button_Search.setFont(new Font("Calibri", Font.BOLD, 14));
+		Button_Search.setBounds(218, 104, 78, 23);
+		panel_Search.add(Button_Search);
+		
+		JLabel lbl_SearchBook = new JLabel("Search Book ");
+		lbl_SearchBook.setFont(new Font("Calibri Light", Font.BOLD, 21));
+		lbl_SearchBook.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl_SearchBook.setBounds(10, 11, 286, 35);
+		panel_Search.add(lbl_SearchBook);
+		
+		textField_STitle = new JTextField();
+		textField_STitle.setFont(new Font("Calibri", Font.PLAIN, 12));
+		textField_STitle.setBounds(66, 43, 230, 20);
+		panel_Search.add(textField_STitle);
+		textField_STitle.setColumns(10);
+		
+		textField_SAuthor = new JTextField();
+		textField_SAuthor.setFont(new Font("Calibri", Font.PLAIN, 11));
+		textField_SAuthor.setBounds(66, 72, 230, 20);
+		panel_Search.add(textField_SAuthor);
+		textField_SAuthor.setColumns(10);
 
 		Label_Title = new JLabel("Title");
-		Label_Title.setForeground(new Color(255, 255, 255));
-		Label_Title.setFont(new Font("Calibri", Font.PLAIN, 11));
+		Label_Title.setForeground(new Color(0, 0, 0));
+		Label_Title.setFont(new Font("Calibri", Font.PLAIN, 13));
 		Label_Title.setHorizontalAlignment(SwingConstants.LEFT);
-		Label_Title.setBounds(10, 11, 46, 14);
+		Label_Title.setBounds(10, 56, 46, 14);
 		panel_CRUD.add(Label_Title);
 
 		textField_Title = new JTextField();
-		textField_Title.setBounds(76, 8, 221, 20);
+		textField_Title.setFont(new Font("Calibri", Font.PLAIN, 12));
+		textField_Title.setBounds(76, 51, 221, 20);
 		panel_CRUD.add(textField_Title);
 		textField_Title.setColumns(10);
 
 		Label_Author = new JLabel("Author");
-		Label_Author.setForeground(new Color(255, 255, 255));
-		Label_Author.setFont(new Font("Calibri", Font.PLAIN, 11));
+		Label_Author.setForeground(new Color(0, 0, 0));
+		Label_Author.setFont(new Font("Calibri", Font.PLAIN, 13));
 		Label_Author.setHorizontalAlignment(SwingConstants.LEFT);
-		Label_Author.setBounds(10, 39, 46, 14);
+		Label_Author.setBounds(10, 84, 46, 14);
 		panel_CRUD.add(Label_Author);
 
 		textField_Author = new JTextField();
+		textField_Author.setFont(new Font("Calibri", Font.PLAIN, 12));
 		textField_Author.setColumns(10);
-		textField_Author.setBounds(76, 36, 221, 20);
+		textField_Author.setBounds(76, 79, 221, 20);
 		panel_CRUD.add(textField_Author);
 
 		Label_Quantity = new JLabel("Quantity");
-		Label_Quantity.setForeground(new Color(255, 255, 255));
-		Label_Quantity.setFont(new Font("Calibri", Font.PLAIN, 11));
+		Label_Quantity.setForeground(new Color(0, 0, 0));
+		Label_Quantity.setFont(new Font("Calibri", Font.PLAIN, 13));
 		Label_Quantity.setHorizontalAlignment(SwingConstants.LEFT);
-		Label_Quantity.setBounds(10, 67, 46, 14);
+		Label_Quantity.setBounds(10, 115, 56, 14);
 		panel_CRUD.add(Label_Quantity);
 
 		Label_Price = new JLabel("Price");
-		Label_Price.setForeground(new Color(255, 255, 255));
-		Label_Price.setFont(new Font("Calibri", Font.PLAIN, 11));
+		Label_Price.setForeground(new Color(0, 0, 0));
+		Label_Price.setFont(new Font("Calibri", Font.PLAIN, 13));
 		Label_Price.setHorizontalAlignment(SwingConstants.LEFT);
-		Label_Price.setBounds(10, 95, 46, 14);
+		Label_Price.setBounds(10, 146, 46, 14);
 		panel_CRUD.add(Label_Price);
 
 		textField_Price = new JTextField();
+		textField_Price.setFont(new Font("Calibri", Font.PLAIN, 12));
 		textField_Price.setColumns(10);
-		textField_Price.setBounds(76, 92, 221, 20);
+		textField_Price.setBounds(76, 141, 221, 20);
 		panel_CRUD.add(textField_Price);
 
 		Label_Category = new JLabel("Category");
-		Label_Category.setForeground(new Color(255, 255, 255));
-		Label_Category.setFont(new Font("Calibri", Font.PLAIN, 11));
+		Label_Category.setForeground(new Color(0, 0, 0));
+		Label_Category.setFont(new Font("Calibri", Font.PLAIN, 13));
 		Label_Category.setHorizontalAlignment(SwingConstants.LEFT);
-		Label_Category.setBounds(10, 123, 46, 14);
+		Label_Category.setBounds(10, 178, 56, 14);
 		panel_CRUD.add(Label_Category);
 
 		Label_Description = new JLabel("Description");
-		Label_Description.setForeground(new Color(255, 255, 255));
-		Label_Description.setFont(new Font("Calibri", Font.PLAIN, 11));
+		Label_Description.setForeground(new Color(0, 0, 0));
+		Label_Description.setFont(new Font("Calibri", Font.PLAIN, 13));
 		Label_Description.setHorizontalAlignment(SwingConstants.LEFT);
-		Label_Description.setBounds(10, 158, 58, 14);
+		Label_Description.setBounds(10, 212, 70, 14);
 		panel_CRUD.add(Label_Description);
 
 		textArea_Description = new JTextArea();
-		textArea_Description.setBounds(76, 158, 221, 81);
+		textArea_Description.setFont(new Font("Calibri", Font.PLAIN, 12));
+		textArea_Description.setBounds(98, 205, 199, 81);
 		panel_CRUD.add(textArea_Description);
 
 		Button_New = new JButton("New");
-		Button_New.setFont(new Font("Calibri", Font.BOLD, 11));
-		Button_New.setBounds(56, 250, 89, 23);
+		Button_New.setForeground(Color.WHITE);
+		Button_New.setBackground(new Color(13, 110, 253));
+		Button_New.setFont(new Font("Calibri", Font.BOLD, 14));
+		Button_New.setBounds(56, 297, 89, 23);
 		panel_CRUD.add(Button_New);
 
 		Button_Delete = new JButton("Delete");
+		Button_Delete.setForeground(Color.WHITE);
+		Button_Delete.setBackground(new Color(220, 53, 69));
 		Button_Delete.setEnabled(false);
-		Button_Delete.setFont(new Font("Calibri", Font.BOLD, 11));
-		Button_Delete.setBounds(155, 250, 89, 23);
+		Button_Delete.setFont(new Font("Calibri", Font.BOLD, 14));
+		Button_Delete.setBounds(155, 297, 89, 23);
 		panel_CRUD.add(Button_Delete);
 
 		Button_Update = new JButton("Update");
+		Button_Update.setForeground(Color.WHITE);
+		Button_Update.setBackground(new Color(108, 117, 125));
 		Button_Update.setEnabled(false);
-		Button_Update.setFont(new Font("Calibri", Font.BOLD, 11));
-		Button_Update.setBounds(56, 295, 89, 23);
+		Button_Update.setFont(new Font("Calibri", Font.BOLD, 14));
+		Button_Update.setBounds(56, 342, 89, 23);
 		panel_CRUD.add(Button_Update);
 
 		comboBox_Category = new JComboBox<Object>();
-		comboBox_Category.setBounds(76, 119, 221, 22);
+		comboBox_Category.setFont(new Font("Calibri", Font.PLAIN, 12));
+		comboBox_Category.setBounds(76, 172, 221, 22);
 		panel_CRUD.add(comboBox_Category);
 
 		spinner_Quantity = new JSpinner();
-		spinner_Quantity.setBounds(76, 67, 221, 20);
+		spinner_Quantity.setFont(new Font("Calibri", Font.PLAIN, 12));
+		spinner_Quantity.setBounds(76, 110, 221, 20);
 		panel_CRUD.add(spinner_Quantity);
 
 		Button_Reset = new JButton("Reset");
-		Button_Reset.setFont(new Font("Calibri", Font.BOLD, 11));
-		Button_Reset.setBounds(155, 295, 89, 23);
+		Button_Reset.setForeground(Color.WHITE);
+		Button_Reset.setBackground(new Color(25, 135, 84));
+		Button_Reset.setFont(new Font("Calibri", Font.BOLD, 14));
+		Button_Reset.setBounds(155, 342, 89, 23);
 		panel_CRUD.add(Button_Reset);
+		
+		JLabel lblNewLabel_1 = new JLabel("Book Management");
+		lblNewLabel_1.setForeground(Color.BLACK);
+		lblNewLabel_1.setBackground(Color.WHITE);
+		lblNewLabel_1.setFont(new Font("Calibri Light", Font.BOLD, 21));
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1.setBounds(10, 11, 287, 34);
+		panel_CRUD.add(lblNewLabel_1);
 
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(314, 26, 693, 434);
@@ -407,6 +476,8 @@ public class FPTBook extends JFrame {
 				return false;
 			};
 		};
+		table.setFont(new Font("Calibri", Font.PLAIN, 14));
+		table.setBackground(Color.LIGHT_GRAY);
 		tableModel.setColumnIdentifiers(column);
 		table.setModel(tableModel);
 		scrollPane.setViewportView(table);
@@ -494,5 +565,4 @@ public class FPTBook extends JFrame {
 		});
 
 	}
-
 }
