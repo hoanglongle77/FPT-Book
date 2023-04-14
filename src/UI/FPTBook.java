@@ -98,7 +98,6 @@ public class FPTBook extends JFrame {
 	/**
 	 * All logical method of the application.
 	 */
-
 	public int GenerateID() {
 		int max = 1;
 		if (myBookList != null && myBookList.size() > 0) {
@@ -115,23 +114,9 @@ public class FPTBook extends JFrame {
 
 	public Book GetDataFromTable() {
 		int selectedRowIndex = table.getSelectedRow();
-		int id;
-		int quantity;
-		int price;
-	    final Class<String> c = String.class;
-
-		if (tableModel.getValueAt(selectedRowIndex, 0).getClass().isInstance(c)&&
-			tableModel.getValueAt(selectedRowIndex, 3).getClass().isInstance(c)&&
-			tableModel.getValueAt(selectedRowIndex, 4).getClass().isInstance(c)) {
-			id = (int) tableModel.getValueAt(selectedRowIndex, 0);
-			quantity = (int) tableModel.getValueAt(selectedRowIndex, 3);
-			price = (int) tableModel.getValueAt(selectedRowIndex, 4);
-		} else {
-			id = Integer.parseInt((String) tableModel.getValueAt(selectedRowIndex, 0));
-			quantity =  Integer.parseInt((String)tableModel.getValueAt(selectedRowIndex, 3));
-			price =  Integer.parseInt((String)tableModel.getValueAt(selectedRowIndex, 4));
-		}
-
+		int id = (int) tableModel.getValueAt(selectedRowIndex, 0);
+		int quantity = (int) tableModel.getValueAt(selectedRowIndex, 3);
+		int price = (int) tableModel.getValueAt(selectedRowIndex, 4);
 		String title = tableModel.getValueAt(selectedRowIndex, 1).toString();
 		String author = tableModel.getValueAt(selectedRowIndex, 2).toString();
 		// String category = tableModel.getValueAt(selectedRowIndex, 5).toString();
@@ -139,6 +124,7 @@ public class FPTBook extends JFrame {
 		Book selectedBook = new Book(id, title, author, quantity, price, description);
 		return selectedBook;
 	}
+
 
 	public void NewBook() {
 		Book newBook = new Book();
@@ -168,13 +154,20 @@ public class FPTBook extends JFrame {
 	}
 
 	public ArrayList<Book> UpdateBook() {
+		int selectedRowIndex = table.getSelectedRow();
 		Book updateBook = GetDataFromTable();
 		updateBook.setTitle(textField_Title.getText());
 		updateBook.setAuthor(textField_Author.getText());
 		updateBook.setQuantity((int) spinner_Quantity.getValue());
 		updateBook.setPrice(Integer.parseInt(textField_Price.getText()));
 		updateBook.setDescription(textArea_Description.getText());
-		myBookList.set(myBookList.indexOf(updateBook), updateBook);
+		myBookList.set(selectedRowIndex, updateBook);
+		tableModel.setValueAt(updateBook.getTitle(),selectedRowIndex , 1);
+		tableModel.setValueAt(updateBook.getAuthor(), selectedRowIndex, 2);
+		tableModel.setValueAt(updateBook.getQuantity(), selectedRowIndex, 3);
+		tableModel.setValueAt(updateBook.getPrice(), selectedRowIndex, 4);
+		tableModel.setValueAt(updateBook.getDescription(), selectedRowIndex, 6);
+		//tableModel.setValueAt(title, selectedRowIndex, 5);
 		return myBookList;
 	}
 
@@ -185,6 +178,8 @@ public class FPTBook extends JFrame {
 		textField_Price.setText("");
 		comboBox_Category.setSelectedIndex(-1);
 		textArea_Description.setText("");
+		Button_Delete.setEnabled(false);
+		Button_Update.setEnabled(false);
 	}
 
 	public void OpenFile() {
@@ -199,11 +194,11 @@ public class FPTBook extends JFrame {
 				try {
 					while ((line = br.readLine()) != null) {
 						String[] words = line.split(", ");
-						rowData[0] = words[0];
+						rowData[0] = Integer.parseInt(words[0]);
 						rowData[1] = words[1];
 						rowData[2] = words[2];
-						rowData[3] = words[3];
-						rowData[4] = words[4];
+						rowData[3] = Integer.parseInt(words[3]);
+						rowData[4] = Integer.parseInt(words[4]);
 						rowData[6] = words[5];
 						// row[5] = words[5]; Add category cell and field
 						// row[6] = words[6];
@@ -215,15 +210,13 @@ public class FPTBook extends JFrame {
 					if (br != null) {
 						br.close();
 					}
-				} catch (NumberFormatException e1) {
-					JOptionPane.showMessageDialog(null, e1.getMessage());
-				} catch (IOException e2) {
-					JOptionPane.showMessageDialog(null, e2.getMessage());
+				} catch (ClassCastException e1) {
+					JOptionPane.showMessageDialog(contentPane, e1.getMessage());
 				}
 			} catch (FileNotFoundException e3) {
-				JOptionPane.showMessageDialog(null, e3.getMessage());
+				JOptionPane.showMessageDialog(contentPane, e3.getMessage());
 			} catch (IOException e4) {
-				JOptionPane.showMessageDialog(null, e4.getMessage());
+				JOptionPane.showMessageDialog(contentPane, e4.getMessage());
 			}
 		}
 	}
@@ -407,7 +400,13 @@ public class FPTBook extends JFrame {
 		contentPane.add(scrollPane);
 
 		tableModel = new DefaultTableModel();
-		table = new JTable(tableModel);
+		table = new JTable(tableModel) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			};
+		};
 		tableModel.setColumnIdentifiers(column);
 		table.setModel(tableModel);
 		scrollPane.setViewportView(table);
@@ -477,14 +476,18 @@ public class FPTBook extends JFrame {
 				JOptionPane.showMessageDialog(contentPane, "You have updated successfully", "Success!",
 						JOptionPane.INFORMATION_MESSAGE);
 				ResetAllField();
-				Button_Update.setEnabled(false);
-				Button_Delete.setEnabled(false);
 			}
 		});
 
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				Book book = GetDataFromTable();
+				textField_Title.setText(book.getTitle());
+				textField_Author.setText(book.getAuthor());
+				spinner_Quantity.setValue(book.getQuantity());
+				textField_Price.setText(Integer.toString(book.getPrice()));
+				textArea_Description.setText(book.getDescription());
 				Button_Delete.setEnabled(true);
 				Button_Update.setEnabled(true);
 			}
