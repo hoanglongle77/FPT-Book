@@ -19,6 +19,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JComboBox;
@@ -31,6 +34,9 @@ import java.util.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.TableRowSorter;
+
 public class FPTBook extends JFrame {
 
 	/**
@@ -77,9 +83,22 @@ public class FPTBook extends JFrame {
 	private Object[] column = { "ID", "Title", "Author", "Quantity", "Price", "Category", "Description" };
 	private Object[] rowData = new Object[7];
 
+	private JTextField textField_Search;
+
 	ArrayList<Book> myBookList = new ArrayList<>();
-	private JTextField textField_STitle;
-	private JTextField textField_SAuthor;
+	String category[] = { "Arts & Music", "Biographies", "Business", "Comics", "Computer & Tech", "Cooking",
+			"Edu & Reference", "Entertainment", "Health & Fitness", "History", "Hobbies & Crafts", "Home & Garden",
+			"Horror", "Kids", "Literature & Fiction", "Medical", "Mysteries", "Parenting", "Religion", "Romance",
+			"Scifi & Fantasy", "Science & Math", "Self-Help", "Social Sciences", "Sports", "Teen", "Travel",
+			"True Crime", "Westerns" };
+
+	private JComboBox<?> comboBox_SCategory;
+	private JLabel lblTitle_Search;
+	private JLabel lblCategory_Search;
+	private JButton btnSearchByCategory;
+	private JLabel lbl_SearchBook;
+	private JLabel Label_BookManagement;
+	private JButton btnSearch;
 
 	/**
 	 * Launch the application.
@@ -90,7 +109,7 @@ public class FPTBook extends JFrame {
 				try {
 					FPTBook frame = new FPTBook();
 					frame.setVisible(true);
-						} catch (Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -121,12 +140,11 @@ public class FPTBook extends JFrame {
 		int price = (int) tableModel.getValueAt(selectedRowIndex, 4);
 		String title = tableModel.getValueAt(selectedRowIndex, 1).toString();
 		String author = tableModel.getValueAt(selectedRowIndex, 2).toString();
-		// String category = tableModel.getValueAt(selectedRowIndex, 5).toString();
+		String category = tableModel.getValueAt(selectedRowIndex, 5).toString();
 		String description = tableModel.getValueAt(selectedRowIndex, 6).toString();
-		Book selectedBook = new Book(id, title, author, quantity, price, description);
+		Book selectedBook = new Book(id, title, author, quantity, price, category, description);
 		return selectedBook;
 	}
-
 
 	public void NewBook() {
 		Book newBook = new Book();
@@ -135,7 +153,7 @@ public class FPTBook extends JFrame {
 		newBook.setAuthor(textField_Author.getText());
 		newBook.setQuantity((int) spinner_Quantity.getValue());
 		newBook.setPrice(Integer.parseInt(textField_Price.getText()));
-		// newBook.setQuantity();
+		newBook.setCategory(comboBox_Category.getSelectedItem().toString());
 		newBook.setDescription(textArea_Description.getText());
 		myBookList.add(newBook);
 		rowData[0] = newBook.getId();
@@ -143,7 +161,7 @@ public class FPTBook extends JFrame {
 		rowData[2] = newBook.getAuthor();
 		rowData[3] = newBook.getQuantity();
 		rowData[4] = newBook.getPrice();
-		// rowData[5] = b.getCategory();
+		rowData[5] = newBook.getCategory();
 		rowData[6] = newBook.getDescription();
 		tableModel.addRow(rowData);
 	}
@@ -162,14 +180,15 @@ public class FPTBook extends JFrame {
 		updateBook.setAuthor(textField_Author.getText());
 		updateBook.setQuantity((int) spinner_Quantity.getValue());
 		updateBook.setPrice(Integer.parseInt(textField_Price.getText()));
+		updateBook.setCategory(comboBox_Category.getSelectedItem().toString());
 		updateBook.setDescription(textArea_Description.getText());
 		myBookList.set(selectedRowIndex, updateBook);
-		tableModel.setValueAt(updateBook.getTitle(),selectedRowIndex , 1);
+		tableModel.setValueAt(updateBook.getTitle(), selectedRowIndex, 1);
 		tableModel.setValueAt(updateBook.getAuthor(), selectedRowIndex, 2);
 		tableModel.setValueAt(updateBook.getQuantity(), selectedRowIndex, 3);
 		tableModel.setValueAt(updateBook.getPrice(), selectedRowIndex, 4);
 		tableModel.setValueAt(updateBook.getDescription(), selectedRowIndex, 6);
-		//tableModel.setValueAt(title, selectedRowIndex, 5);
+		tableModel.setValueAt(updateBook.getCategory(), selectedRowIndex, 5);
 		return myBookList;
 	}
 
@@ -178,13 +197,44 @@ public class FPTBook extends JFrame {
 		textField_Author.setText("");
 		spinner_Quantity.setValue(0);
 		textField_Price.setText("");
-		comboBox_Category.setSelectedIndex(-1);
+		comboBox_Category.setSelectedIndex(0);
 		textArea_Description.setText("");
 		Button_Delete.setEnabled(false);
 		Button_Update.setEnabled(false);
 	}
 
+	public void RefreshTable() {
+		TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(tableModel);
+		table.setRowSorter(sorter);
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
+	}
+
+	private void SearchByCategory(String category) {
+		TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(tableModel);
+		table.setRowSorter(tr);
+		if (category != "") {
+			tr.setRowFilter(RowFilter.regexFilter(category));
+		} else {
+			table.setRowSorter(tr);
+		}
+	}
+
+	private void Search(String searchString) {
+		TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(tableModel);
+		table.setRowSorter(tr);
+		if (searchString != "") {
+			tr.setRowFilter(RowFilter.regexFilter(searchString));
+		} else {
+			table.setRowSorter(tr);
+		}
+	}
+
 	public void OpenFile() {
+		// Clear list and table before open file
+		tableModel.setRowCount(0);
+		myBookList.clear();
 		JFileChooser myFileChooser = new JFileChooser(new File("c:\\"));
 		myFileChooser.setDialogTitle("Open a file");
 		myFileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
@@ -201,12 +251,11 @@ public class FPTBook extends JFrame {
 						rowData[2] = words[2];
 						rowData[3] = Integer.parseInt(words[3]);
 						rowData[4] = Integer.parseInt(words[4]);
-						rowData[6] = words[5];
-						// row[5] = words[5]; Add category cell and field
-						// row[6] = words[6];
+						rowData[5] = words[5];
+						rowData[6] = words[6];
 						tableModel.addRow(rowData);
 						Book b = new Book(Integer.parseInt(words[0]), words[1], words[2], Integer.parseInt(words[3]),
-								Integer.parseInt(words[4]), words[5]);
+								Integer.parseInt(words[4]), words[5], words[6]);
 						myBookList.add(b);
 					}
 					if (br != null) {
@@ -248,16 +297,18 @@ public class FPTBook extends JFrame {
 	 */
 
 	public FPTBook() {
+		DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<String>(category);
+
 		setIconImage(Toolkit.getDefaultToolkit().getImage(FPTBook.class.getResource("/icon/logo-fpt.jpg")));
 		setTitle("University of Greenwich - Book Management System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1023, 510);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		
+
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		menuBar = new JMenuBar();
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setBounds(0, 0, 1007, 28);
@@ -304,56 +355,55 @@ public class FPTBook extends JFrame {
 
 		panel_Search = new JPanel();
 		panel_Search.setBackground(Color.LIGHT_GRAY);
-		tabbedPane.addTab("Satistical and Search", null, panel_Search, null);
+		tabbedPane.addTab("Search", null, panel_Search, null);
 		panel_Search.setLayout(null);
-		
-		JComboBox comboBox_SCategory = new JComboBox();
+
+		comboBox_SCategory = new JComboBox<>(comboModel);
+		comboBox_SCategory.setSelectedIndex(0);
 		comboBox_SCategory.setFont(new Font("Calibri", Font.PLAIN, 11));
-		comboBox_SCategory.setBounds(66, 102, 142, 22);
+		comboBox_SCategory.setBounds(92, 117, 204, 22);
 		panel_Search.add(comboBox_SCategory);
-		
-		JLabel lblTitle_Search = new JLabel("Title");
-		lblTitle_Search.setFont(new Font("Calibri", Font.PLAIN, 13));
-		lblTitle_Search.setBounds(10, 48, 46, 14);
+
+		lblTitle_Search = new JLabel("Title / Author");
+		lblTitle_Search.setFont(new Font("Calibri", Font.BOLD, 13));
+		lblTitle_Search.setBounds(10, 55, 92, 14);
 		panel_Search.add(lblTitle_Search);
-		
-		JLabel lblCategory_Search = new JLabel("Category");
-		lblCategory_Search.setFont(new Font("Calibri", Font.PLAIN, 13));
-		lblCategory_Search.setBounds(10, 108, 67, 14);
+
+		lblCategory_Search = new JLabel("Category");
+		lblCategory_Search.setFont(new Font("Calibri", Font.BOLD, 13));
+		lblCategory_Search.setBounds(10, 121, 67, 14);
 		panel_Search.add(lblCategory_Search);
-		
-		JLabel lblAuthor_Search = new JLabel("Author");
-		lblAuthor_Search.setFont(new Font("Calibri", Font.PLAIN, 13));
-		lblAuthor_Search.setBounds(10, 77, 46, 14);
-		panel_Search.add(lblAuthor_Search);
-		
-		JButton Button_Search = new JButton("Search");
-		Button_Search.setBackground(new Color(13, 202, 240));
-		Button_Search.setFont(new Font("Calibri", Font.BOLD, 14));
-		Button_Search.setBounds(218, 104, 78, 23);
-		panel_Search.add(Button_Search);
-		
-		JLabel lbl_SearchBook = new JLabel("Search Book ");
+
+		btnSearchByCategory = new JButton("Search By Category");
+
+		btnSearchByCategory.setForeground(new Color(255, 255, 255));
+		btnSearchByCategory.setBackground(new Color(13, 110, 253));
+		btnSearchByCategory.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnSearchByCategory.setBounds(141, 150, 155, 23);
+		panel_Search.add(btnSearchByCategory);
+
+		lbl_SearchBook = new JLabel("Search Book ");
 		lbl_SearchBook.setFont(new Font("Calibri Light", Font.BOLD, 21));
 		lbl_SearchBook.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl_SearchBook.setBounds(10, 11, 286, 35);
 		panel_Search.add(lbl_SearchBook);
-		
-		textField_STitle = new JTextField();
-		textField_STitle.setFont(new Font("Calibri", Font.PLAIN, 12));
-		textField_STitle.setBounds(66, 43, 230, 20);
-		panel_Search.add(textField_STitle);
-		textField_STitle.setColumns(10);
-		
-		textField_SAuthor = new JTextField();
-		textField_SAuthor.setFont(new Font("Calibri", Font.PLAIN, 11));
-		textField_SAuthor.setBounds(66, 72, 230, 20);
-		panel_Search.add(textField_SAuthor);
-		textField_SAuthor.setColumns(10);
+
+		textField_Search = new JTextField();
+		textField_Search.setFont(new Font("Calibri", Font.PLAIN, 12));
+		textField_Search.setBounds(92, 52, 204, 20);
+		panel_Search.add(textField_Search);
+		textField_Search.setColumns(10);
+
+		btnSearch = new JButton("Search ");
+		btnSearch.setForeground(Color.WHITE);
+		btnSearch.setFont(new Font("Calibri", Font.BOLD, 14));
+		btnSearch.setBackground(new Color(13, 110, 253));
+		btnSearch.setBounds(141, 83, 155, 23);
+		panel_Search.add(btnSearch);
 
 		Label_Title = new JLabel("Title");
 		Label_Title.setForeground(new Color(0, 0, 0));
-		Label_Title.setFont(new Font("Calibri", Font.PLAIN, 13));
+		Label_Title.setFont(new Font("Calibri", Font.BOLD, 13));
 		Label_Title.setHorizontalAlignment(SwingConstants.LEFT);
 		Label_Title.setBounds(10, 56, 46, 14);
 		panel_CRUD.add(Label_Title);
@@ -366,7 +416,7 @@ public class FPTBook extends JFrame {
 
 		Label_Author = new JLabel("Author");
 		Label_Author.setForeground(new Color(0, 0, 0));
-		Label_Author.setFont(new Font("Calibri", Font.PLAIN, 13));
+		Label_Author.setFont(new Font("Calibri", Font.BOLD, 13));
 		Label_Author.setHorizontalAlignment(SwingConstants.LEFT);
 		Label_Author.setBounds(10, 84, 46, 14);
 		panel_CRUD.add(Label_Author);
@@ -379,14 +429,14 @@ public class FPTBook extends JFrame {
 
 		Label_Quantity = new JLabel("Quantity");
 		Label_Quantity.setForeground(new Color(0, 0, 0));
-		Label_Quantity.setFont(new Font("Calibri", Font.PLAIN, 13));
+		Label_Quantity.setFont(new Font("Calibri", Font.BOLD, 13));
 		Label_Quantity.setHorizontalAlignment(SwingConstants.LEFT);
 		Label_Quantity.setBounds(10, 115, 56, 14);
 		panel_CRUD.add(Label_Quantity);
 
 		Label_Price = new JLabel("Price");
 		Label_Price.setForeground(new Color(0, 0, 0));
-		Label_Price.setFont(new Font("Calibri", Font.PLAIN, 13));
+		Label_Price.setFont(new Font("Calibri", Font.BOLD, 13));
 		Label_Price.setHorizontalAlignment(SwingConstants.LEFT);
 		Label_Price.setBounds(10, 146, 46, 14);
 		panel_CRUD.add(Label_Price);
@@ -399,14 +449,14 @@ public class FPTBook extends JFrame {
 
 		Label_Category = new JLabel("Category");
 		Label_Category.setForeground(new Color(0, 0, 0));
-		Label_Category.setFont(new Font("Calibri", Font.PLAIN, 13));
+		Label_Category.setFont(new Font("Calibri", Font.BOLD, 13));
 		Label_Category.setHorizontalAlignment(SwingConstants.LEFT);
 		Label_Category.setBounds(10, 178, 56, 14);
 		panel_CRUD.add(Label_Category);
 
 		Label_Description = new JLabel("Description");
 		Label_Description.setForeground(new Color(0, 0, 0));
-		Label_Description.setFont(new Font("Calibri", Font.PLAIN, 13));
+		Label_Description.setFont(new Font("Calibri", Font.BOLD, 13));
 		Label_Description.setHorizontalAlignment(SwingConstants.LEFT);
 		Label_Description.setBounds(10, 212, 70, 14);
 		panel_CRUD.add(Label_Description);
@@ -439,7 +489,7 @@ public class FPTBook extends JFrame {
 		Button_Update.setBounds(56, 342, 89, 23);
 		panel_CRUD.add(Button_Update);
 
-		comboBox_Category = new JComboBox<Object>();
+		comboBox_Category = new JComboBox<>(comboModel);
 		comboBox_Category.setFont(new Font("Calibri", Font.PLAIN, 12));
 		comboBox_Category.setBounds(76, 172, 221, 22);
 		panel_CRUD.add(comboBox_Category);
@@ -455,17 +505,21 @@ public class FPTBook extends JFrame {
 		Button_Reset.setFont(new Font("Calibri", Font.BOLD, 14));
 		Button_Reset.setBounds(155, 342, 89, 23);
 		panel_CRUD.add(Button_Reset);
+
+		Label_BookManagement = new JLabel("Book Management");
+		Label_BookManagement.setForeground(Color.BLACK);
+		Label_BookManagement.setBackground(Color.WHITE);
+		Label_BookManagement.setFont(new Font("Calibri Light", Font.BOLD, 21));
+		Label_BookManagement.setHorizontalAlignment(SwingConstants.CENTER);
+		Label_BookManagement.setBounds(10, 11, 287, 34);
+		panel_CRUD.add(Label_BookManagement);
 		
-		JLabel lblNewLabel_1 = new JLabel("Book Management");
-		lblNewLabel_1.setForeground(Color.BLACK);
-		lblNewLabel_1.setBackground(Color.WHITE);
-		lblNewLabel_1.setFont(new Font("Calibri Light", Font.BOLD, 21));
-		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_1.setBounds(10, 11, 287, 34);
-		panel_CRUD.add(lblNewLabel_1);
+		JButton btnNewButton = new JButton("Reload Data");
+		btnNewButton.setBounds(56, 376, 188, 23);
+		panel_CRUD.add(btnNewButton);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(314, 26, 693, 434);
+		scrollPane.setBounds(314, 26, 693, 445);
 		contentPane.add(scrollPane);
 
 		tableModel = new DefaultTableModel();
@@ -486,6 +540,7 @@ public class FPTBook extends JFrame {
 		MenuItem_OpenFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				OpenFile();
+
 			}
 		});
 
@@ -558,11 +613,39 @@ public class FPTBook extends JFrame {
 				textField_Author.setText(book.getAuthor());
 				spinner_Quantity.setValue(book.getQuantity());
 				textField_Price.setText(Integer.toString(book.getPrice()));
+				comboBox_Category.setSelectedItem(book.getCategory());
 				textArea_Description.setText(book.getDescription());
 				Button_Delete.setEnabled(true);
 				Button_Update.setEnabled(true);
 			}
 		});
 
+		btnSearchByCategory.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String category = comboBox_SCategory.getSelectedItem().toString();
+				SearchByCategory(category);
+			}
+		});
+
+		btnSearch.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String str = textField_Search.getText();
+				if (str.isEmpty()) {
+					JOptionPane.showMessageDialog(contentPane, "Your title field is Empty");
+				} else {
+					Search(str);
+				}
+				textField_Search.setText("");
+			}
+		});
+		
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				RefreshTable();
+			}
+		});
 	}
 }

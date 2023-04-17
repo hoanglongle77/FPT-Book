@@ -8,22 +8,31 @@ public class Book {
 	private String author;
 	private int quantity;
 	private int price;
+	private String category;
 	private String description;
-	
 	
 	public Book() {
 	}
 	
-	public Book(int id, String title, String author, int quantity, int price, String description) {
+	public Book(int id, String title, String author, int quantity, int price, String category, String description) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.author = author;
 		this.quantity = quantity;
 		this.price = price;
+		this.category = category;
 		this.description = description;
 	}
 	
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -63,12 +72,12 @@ public class Book {
 
 	@Override
 	public String toString() {
-		return id + ", " + title + ", " + author + ", " + quantity + ", " + price + ", " + description + "\n";
+		return id + ", " + title + ", " + author + ", " + quantity + ", " + price + ", " + category + ", " + description + "\n";
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(author, description, id, price, quantity, title);
+		return Objects.hash(author, category, description, id, price, quantity, title);
 	}
 
 	@Override
@@ -80,9 +89,24 @@ public class Book {
 		if (getClass() != obj.getClass())
 			return false;
 		Book other = (Book) obj;
-		return Objects.equals(author, other.author) && Objects.equals(description, other.description) && id == other.id
-				&& price == other.price && quantity == other.quantity && Objects.equals(title, other.title);
+		return Objects.equals(author, other.author) && Objects.equals(category, other.category)
+				&& Objects.equals(description, other.description) && id == other.id && price == other.price
+				&& quantity == other.quantity && Objects.equals(title, other.title);
 	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
