@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import FileController.FileTypeFilter;
 import Model.Book;
+import Validation.FormValidator;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -22,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JComboBox;
@@ -84,14 +86,6 @@ public class FPTBook extends JFrame {
 	private Object[] rowData = new Object[7];
 
 	private JTextField textField_Search;
-
-	ArrayList<Book> myBookList = new ArrayList<>();
-	String category[] = { "Arts & Music", "Biographies", "Business", "Comics", "Computer & Tech", "Cooking",
-			"Edu & Reference", "Entertainment", "Health & Fitness", "History", "Hobbies & Crafts", "Home & Garden",
-			"Horror", "Kids", "Literature & Fiction", "Medical", "Mysteries", "Parenting", "Religion", "Romance",
-			"Scifi & Fantasy", "Science & Math", "Self-Help", "Social Sciences", "Sports", "Teen", "Travel",
-			"True Crime", "Westerns" };
-
 	private JComboBox<?> comboBox_SCategory;
 	private JLabel lblTitle_Search;
 	private JLabel lblCategory_Search;
@@ -99,6 +93,13 @@ public class FPTBook extends JFrame {
 	private JLabel lbl_SearchBook;
 	private JLabel Label_BookManagement;
 	private JButton btnSearch;
+
+	ArrayList<Book> myBookList = new ArrayList<>();
+	String category[] = { "Arts & Music", "Biographies", "Business", "Comics", "Computer & Tech", "Cooking",
+			"Edu & Reference", "Entertainment", "Health & Fitness", "History", "Hobbies & Crafts", "Home & Garden",
+			"Horror", "Kids", "Literature & Fiction", "Medical", "Mysteries", "Parenting", "Religion", "Romance",
+			"Scifi & Fantasy", "Science & Math", "Self-Help", "Social Sciences", "Sports", "Teen", "Travel",
+			"True Crime", "Westerns" };
 
 	/**
 	 * Launch the application.
@@ -119,6 +120,7 @@ public class FPTBook extends JFrame {
 	/**
 	 * All logical method of the application.
 	 */
+
 	public int GenerateID() {
 		int max = 1;
 		if (myBookList != null && myBookList.size() > 0) {
@@ -206,9 +208,9 @@ public class FPTBook extends JFrame {
 	public void RefreshTable() {
 		TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(tableModel);
 		table.setRowSorter(sorter);
-        List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        sorter.setSortKeys(sortKeys);
+		List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
+		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+		sorter.setSortKeys(sortKeys);
 	}
 
 	private void SearchByCategory(String category) {
@@ -513,7 +515,7 @@ public class FPTBook extends JFrame {
 		Label_BookManagement.setHorizontalAlignment(SwingConstants.CENTER);
 		Label_BookManagement.setBounds(10, 11, 287, 34);
 		panel_CRUD.add(Label_BookManagement);
-		
+
 		JButton btnNewButton = new JButton("Reload Data");
 		btnNewButton.setBounds(56, 376, 188, 23);
 		panel_CRUD.add(btnNewButton);
@@ -536,54 +538,54 @@ public class FPTBook extends JFrame {
 		table.setModel(tableModel);
 		scrollPane.setViewportView(table);
 
-		// 1. Open file
-		MenuItem_OpenFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				OpenFile();
+		// 1. Add validation to all field in CRUD Panel
+		textField_Title.setName("string");
+		textField_Title.setInputVerifier(FormValidator.getVerifier());
 
-			}
+		textField_Author.setName("string");
+		textField_Author.setInputVerifier(FormValidator.getVerifier());
+
+		textField_Price.setName("integer");
+		textField_Price.setInputVerifier(FormValidator.getVerifier());
+
+		spinner_Quantity.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+		spinner_Quantity.setInputVerifier(FormValidator.getVerifier());
+
+		// 2. Add validation to all field in Search Panel
+
+		// 3. Open File
+		MenuItem_OpenFile.addActionListener(e -> OpenFile());
+
+		// 4. Save File
+		MenuItem_SaveFile.addActionListener(e -> SaveFile());
+
+		// 5. About
+		MenuItem_About.addActionListener(e -> {
+		    JOptionPane.showMessageDialog(contentPane,
+		            "FPT Book Management App v1.0 - By Le Nguyen Hoang Long",
+		            "System Info", JOptionPane.INFORMATION_MESSAGE);
 		});
 
-		// 2. Save File
-		MenuItem_SaveFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				SaveFile();
-			}
+		// 6. Exit Application
+		MenuItem_Exit.addActionListener(e -> System.exit(0));
+
+		// 6. Reset
+		Button_Reset.addActionListener(e -> ResetAllField());
+
+		// 7. Button new - Use to create new book
+		Button_New.addActionListener((ActionEvent e) -> {
+		    if (FormValidator.areAllComponentsValid(panel_CRUD)) {
+		        NewBook();
+		        ResetAllField();
+		        JOptionPane.showMessageDialog(contentPane, "You have added successfully", "Success!",
+		                JOptionPane.INFORMATION_MESSAGE);
+		    } else {
+		        JOptionPane.showMessageDialog(contentPane, "Error when adding new book", "Error",
+		                JOptionPane.ERROR_MESSAGE);
+		    }
 		});
 
-		// 3. About
-		MenuItem_About.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(contentPane, "FPT Book Management App v1.0 - By Le Nguyen Hoang Long",
-						" System Info!", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-
-		// 4. Exit Application
-		MenuItem_Exit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
-
-		// 5. Reset
-		Button_Reset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ResetAllField();
-			}
-		});
-
-		// 6. Button new - Use to create new book
-		Button_New.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				NewBook();
-				ResetAllField();
-				JOptionPane.showMessageDialog(contentPane, "You have add successfully", "Success!",
-						JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-
-		// 7. Button delete - Use to delete a book in list
+		// 8. Button delete - Use to delete a book in list
 		Button_Delete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DeleteBook();
@@ -595,7 +597,7 @@ public class FPTBook extends JFrame {
 			}
 		});
 
-		// 8. Button update - Use to update a book in list
+		// 9. Button update - Use to update a book in list
 		Button_Update.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				UpdateBook();
@@ -605,6 +607,7 @@ public class FPTBook extends JFrame {
 			}
 		});
 
+		// 10.
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -620,6 +623,7 @@ public class FPTBook extends JFrame {
 			}
 		});
 
+		// 11.
 		btnSearchByCategory.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -628,6 +632,7 @@ public class FPTBook extends JFrame {
 			}
 		});
 
+		// 12.
 		btnSearch.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -640,7 +645,8 @@ public class FPTBook extends JFrame {
 				textField_Search.setText("");
 			}
 		});
-		
+
+		// 13.
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
